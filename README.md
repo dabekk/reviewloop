@@ -40,7 +40,7 @@ npm install
 npm run dev        # API on :8787, dashboard on :5173
 ```
 
-With no `MONGODB_URI`, the API starts an in-memory MongoDB and seeds it, so nothing else is needed. To use Atlas, copy `apps/api/.env.example` to `apps/api/.env`, set `MONGODB_URI`, and run `npm run seed` once.
+With no `MONGODB_URI`, the API starts an in-memory MongoDB and seeds it, so nothing else is needed. To use Atlas, copy `apps/api/.env.example` to `apps/api/.env` and set `MONGODB_URI`. An empty database is seeded on first boot.
 
 - Dashboard: http://localhost:5173
 - Collection page: http://localhost:5173/s/aurora-studio/q3-client-wins
@@ -88,7 +88,7 @@ Daily bucket documents per space (`metrics_daily`, unique on `spaceId + day`), i
 ## Deploy
 
 - **Database**: MongoDB Atlas. An M0 is enough for the demo.
-- **API**: Render, from `render.yaml`. Set `MONGODB_URI` and optionally `ANTHROPIC_API_KEY` and `WEBHOOK_URL`, then run `npm run seed -w @reviewloop/api` once with the same `MONGODB_URI`. The API also serves the widget script at `/w/v1.js`. On the free plan the API sleeps when idle and takes up to a minute to wake.
+- **API**: Render, from `render.yaml`. Set `MONGODB_URI` and optionally `ANTHROPIC_API_KEY` and `WEBHOOK_URL`. An empty database is seeded on first boot; `npm run seed` resets it. The API also serves the widget script at `/w/v1.js`. On the free plan the API sleeps when idle and takes up to a minute to wake.
 - **Dashboard**: any static host. `VITE_API_URL=https://<api> npm run build -w @reviewloop/web` and upload `apps/web/dist`. The build fails without `VITE_API_URL`. It is built for the `/reviewloop/` subpath; change `base` in `apps/web/vite.config.ts` for another path. `public/.htaccess` handles deep links on Apache hosts.
 
 Atlas network access needs to allow Render's outbound IPs. On the free plan those change, so the demo uses `0.0.0.0/0` with a strong database password.
