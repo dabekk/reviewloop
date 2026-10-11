@@ -21,7 +21,10 @@ const Env = z.object({
 export type Config = z.infer<typeof Env>;
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env): Config {
-  const parsed = Env.safeParse(env);
+  // Hosting dashboards often save an optional variable as "" rather than
+  // leaving it out. Treat that as unset.
+  const set = Object.fromEntries(Object.entries(env).filter(([, v]) => v !== ""));
+  const parsed = Env.safeParse(set);
   if (!parsed.success) {
     throw new Error(`Invalid environment:\n${z.prettifyError(parsed.error)}`);
   }
