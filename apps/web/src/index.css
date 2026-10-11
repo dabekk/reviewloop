@@ -1,0 +1,108 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif: "Instrument Serif", ui-serif, Georgia, serif;
+
+  /* Surfaces & ink */
+  --color-ground: #f6f5f3;
+  --color-surface: #ffffff;
+  --color-sunken: #efeeea;
+  --color-line: #e4e2dd;
+  --color-line-strong: #d3d0c9;
+  --color-ink: #171614;
+  --color-ink-2: #57544e;
+  --color-ink-3: #8a8680;
+
+  /* Brand accent - validated categorical slot 7 (violet) */
+  --color-accent: #4a3aa7;
+  --color-accent-deep: #382b80;
+  --color-accent-soft: #eeebfa;
+
+  /* Status - always shipped with an icon or label, never colour alone */
+  --color-good: #1baf7a;
+  --color-good-soft: #e4f6ee;
+  --color-warn: #eda100;
+  --color-warn-soft: #fdf3dd;
+  --color-serious: #e34948;
+  --color-serious-soft: #fdeaea;
+}
+
+html { -webkit-font-smoothing: antialiased; scroll-behavior: smooth; }
+body { background: var(--color-ground); color: var(--color-ink); font-family: var(--font-sans); }
+
+/* The browser default outline is white on a white surface - invisible. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Mobile section chip row - scrollable without a visible scrollbar. */
+.rl-noscrollbar { scrollbar-width: none; -ms-overflow-style: none; }
+.rl-noscrollbar::-webkit-scrollbar { display: none; }
+
+/* Recessive chart furniture */
+.recharts-cartesian-axis-tick text { fill: var(--color-ink-3); font-size: 11px; }
+.recharts-cartesian-grid line { stroke: var(--color-line); }
+
+@keyframes rl-fade-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+.rl-enter { animation: rl-fade-up .28s cubic-bezier(.22,.68,.35,1) both; }
+
+/* Below lg the AI panel is a bottom sheet. Sliding it off-screen leaves its
+   buttons in the tab order, so it is hidden with visibility as well. The
+   transition keeps the slide-out visible on the way down. */
+@media (max-width: 1023.98px) {
+  .rl-sheet { transition-property: transform, visibility; }
+  /* Opening: visible at once, so the slide-in is seen and the sheet can take
+     focus. Closing: stay visible for the slide-down, then hide. Chromium
+     otherwise flips visibility at the halfway point in both directions. */
+  /* The open state transitions transform ONLY, and states visibility
+     explicitly, so the reduced-motion `transition-duration: .01ms !important`
+     block below cannot delay the flip to visible. Without this the sheet is
+     still computed `hidden` on the frame it tries to take focus, so .focus()
+     no-ops and focus stays on the trigger outside the dialog. */
+  .rl-sheet[data-open="true"] {
+    visibility: visible;
+    transition-property: transform;
+    transition-duration: .15s;
+    transition-delay: 0s;
+  }
+  .rl-sheet[data-open="false"] {
+    visibility: hidden;
+    transition-duration: .15s, 0s;
+    transition-delay: 0s, .15s;
+  }
+}
+
+/* `transition-property` has an initial value of `all`, so the reduced-motion
+   block below - which forces a non-zero duration onto EVERY element - makes
+   every element transition every property, inherited `visibility` included.
+   `visibility` is a discrete property: it holds the OLD value for the whole
+   duration. So when the sheet opens under reduced motion, the sheet itself
+   computes `visible` (the rule above says so explicitly) while every button
+   INSIDE it is still computing `hidden` on the frame the dialog moves focus,
+   and `.focus()` silently no-ops on a hidden element. Exempting the open
+   sheet's subtree costs nothing here: under reduced motion every duration is
+   already .01ms, so there is no transition left to lose. */
+@media (max-width: 1023.98px) and (prefers-reduced-motion: reduce) {
+  .rl-sheet[data-open="true"] * { transition-property: transform; }
+}
+
+/* Honour a reduced-motion preference: no smooth scrolling, no entrance
+   animation, no sheet slide. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::selection { background: var(--color-accent-soft); }

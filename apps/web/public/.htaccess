@@ -1,0 +1,11 @@
+RewriteEngine On
+RewriteBase /reviewloop/
+
+# Serve real files/directories directly (JS, CSS, images, etc.)
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Everything else under /reviewloop/ (e.g. /reviewloop/moderation) falls back to the
+# SPA entry point so the client-side router can handle it.
+RewriteRule ^ index.html [L]

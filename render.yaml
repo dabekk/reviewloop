@@ -1,0 +1,28 @@
+# Render blueprint for the API. The dashboard is a static build hosted separately.
+services:
+  - type: web
+    name: reviewloop-api
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build -w @reviewloop/widget && npm run build -w @reviewloop/api
+    startCommand: npm start -w @reviewloop/api
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "24"
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DB
+        value: reviewloop
+      - key: CORS_ORIGINS
+        value: https://automatemonday.com
+      - key: PUBLIC_APP_URL
+        value: https://automatemonday.com/reviewloop/
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: WEBHOOK_URL
+        sync: false
+      - key: WEBHOOK_SECRET
+        generateValue: true
