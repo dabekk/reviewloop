@@ -1,4 +1,4 @@
-import path from "node:path";
+import { fileURLToPath } from "node:url";
 import cors from "cors";
 import express from "express";
 import helmet from "helmet";
@@ -89,8 +89,12 @@ export function createApp(deps: AppDeps) {
     cache,
     queue,
     now: deps.now ?? (() => new Date()),
+    // Relative to this module, not the working directory, so it resolves the
+    // same whether the host starts the app from the repo root or apps/api.
+    // src/app.ts in development and dist/server.mjs in production are both
+    // three levels below the repo root.
     widgetBundlePath:
-      deps.widgetBundlePath ?? path.resolve(process.cwd(), "../../packages/widget/dist/v1.js"),
+      deps.widgetBundlePath ?? fileURLToPath(new URL("../../../packages/widget/dist/v1.js", import.meta.url)),
   };
 
   const app = express();
