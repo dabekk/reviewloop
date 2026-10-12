@@ -1,3 +1,5 @@
+import { existsSync } from "node:fs";
+import path from "node:path";
 import { fileURLToPath } from "node:url";
 import cors from "cors";
 import express from "express";
@@ -21,6 +23,8 @@ export interface AppDeps {
   webhooks: WebhookSender | null;
   now?: () => Date;
   widgetBundlePath?: string;
+  /** Built dashboard to serve at /. Skipped when the folder does not exist. */
+  webDistPath?: string;
   /** "memory" when running on the development in-memory MongoDB. Shown on /health. */
   database?: "atlas" | "memory";
 }
@@ -121,6 +125,21 @@ export function createApp(deps: AppDeps) {
   app.use("/api/public", dashboardCors, publicRoutes(ctx));
   app.use("/api", dashboardCors, dashboardRoutes(ctx));
   app.use("/w", widgetRoutes(ctx));
+
+  // The dashboard and the public collection page, from the same origin as the
+  // API. Hashed assets are cached for a year; index.html is always revalidated
+  // so a deploy shows up on the next load. Any other GET is a client-side
+  // route (/s/<workspace>/<space>), so it gets index.html.
+  const webDist = deps.webDistPath ?? fileURLToPath(new URL("../../web/dist", import.meta.url));
+  if (existsSync(path.join(webDist, "index.html"))) {
+    app.use("/assets", express.static(path.join(webDist, "assets"), { immutable: true, maxAge: "1y" }));
+    app.use(express.static(webDist, { index: false, maxAge: "1h" }));
+    app.get(/^\/(?!api\/|w\/|health$).*/, (_req, res) => {
+      res.set("Cache-Control", "no-cache");
+      res.sendFile(path.join(webDist, "index.html"));
+    });
+  }
+
   app.use((_req, res) => {
     res.status(404).json({ error: "Not found" });
   });

@@ -10,7 +10,7 @@ import {
   type SubmissionInput,
 } from "@reviewloop/shared";
 
-/** Empty in development: Vite proxies /api and /w to the local API. */
+/** Empty means same origin: the API serves the dashboard, and Vite proxies in development. */
 export const API_BASE = (import.meta.env.VITE_API_URL ?? "").replace(/\/$/, "");
 
 /** The origin third-party pages load the widget from. */

@@ -233,7 +233,7 @@ export function mount(host: HTMLElement, opts: MountOptions): WidgetHandle {
           ? renderSingle(first)
           : renderGrid(items, opts.limit ?? 6);
     const link = el("a", undefined, "Powered by ReviewLoop");
-    link.href = "https://automatemonday.com/reviewloop/";
+    link.href = "https://reviewloop.automatemonday.com/";
     link.target = "_blank";
     link.rel = "noopener";
     frame.replaceChildren(body, el("div", "foot", link));

@@ -87,8 +87,16 @@ Daily bucket documents per space (`metrics_daily`, unique on `spaceId + day`), i
 
 ## Deploy
 
-- **Database**: MongoDB Atlas. An M0 is enough for the demo.
-- **API**: Render, from `render.yaml`. Set `MONGODB_URI` and optionally `ANTHROPIC_API_KEY` and `WEBHOOK_URL`. An empty database is seeded on first boot; `npm run seed` resets it. The API also serves the widget script at `/w/v1.js`. On the free plan the API sleeps when idle and takes up to a minute to wake.
-- **Dashboard**: any static host. `VITE_API_URL=https://<api> npm run build -w @reviewloop/web` and upload `apps/web/dist`. The build fails without `VITE_API_URL`. It is built for the `/reviewloop/` subpath; change `base` in `apps/web/vite.config.ts` for another path. `public/.htaccess` handles deep links on Apache hosts.
+One Node app serves everything: the dashboard at `/`, the collection page at `/s/<workspace>/<space>`, the API at `/api`, and the widget at `/w`. Same origin, so the dashboard needs no API URL and no CORS.
 
-Atlas network access needs to allow Render's outbound IPs. On the free plan those change, so the demo uses `0.0.0.0/0` with a strong database password.
+```bash
+npm ci
+npm run build      # widget, dashboard, then the API bundle
+npm start          # node server.cjs
+```
+
+`server.cjs` is a CommonJS entry point for hosts that load apps with `require()` (LiteSpeed, Passenger). `PORT` may be a number or a socket path.
+
+Environment variables are listed in `apps/api/.env.example`. In production `MONGODB_URI` is required; the rest are optional. An empty database is seeded on first boot, and `npm run seed` resets it. `GET /health` reports the database kind, whether AI assist is on, and the environment, without any values.
+
+The live demo runs as a Hostinger Node.js web app built from `main`, on a MongoDB Atlas M0. Atlas network access is open to all IPs, because shared hosting has no fixed outbound IP, so the database user has a strong password.

@@ -11,8 +11,7 @@
   },
   "scripts": {
     "dev": "npm run build -w @reviewloop/widget && concurrently -n api,web -c magenta,cyan \"npm run dev -w @reviewloop/api\" \"npm run dev -w @reviewloop/web\"",
-    "build": "npm run build -w @reviewloop/widget && npm run build -w @reviewloop/api",
-    "build:web": "npm run build -w @reviewloop/web",
+    "build": "npm run build -w @reviewloop/widget && npm run build -w @reviewloop/web && npm run build -w @reviewloop/api",
     "start": "node server.cjs",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",

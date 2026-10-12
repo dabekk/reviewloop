@@ -26,7 +26,7 @@ x-reviewloop-signature: t=1760216482,v1=6b1f...c07e
     "company": "Northwind Logistics",
     "rating": 5,
     "body": "We came to Aurora with a half-finished design system...",
-    "review_url": "https://automatemonday.com/reviewloop/#moderation"
+    "review_url": "https://reviewloop.automatemonday.com/#moderation"
   }
 }`;
 
