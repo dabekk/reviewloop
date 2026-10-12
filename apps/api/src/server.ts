@@ -27,6 +27,7 @@ if (stopMemoryServer || (await c.workspaces.countDocuments()) === 0) await seedD
 const { app, ctx } = createApp({
   c,
   cfg,
+  database: stopMemoryServer ? "memory" : "atlas",
   generate: cfg.ANTHROPIC_API_KEY ? anthropicGenerate(cfg.ANTHROPIC_API_KEY, cfg.ANTHROPIC_MODEL) : null,
   webhooks: cfg.WEBHOOK_URL ? webhookSender(c, cfg.WEBHOOK_URL, cfg.WEBHOOK_SECRET) : null,
 });

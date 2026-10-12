@@ -21,6 +21,8 @@ export interface AppDeps {
   webhooks: WebhookSender | null;
   now?: () => Date;
   widgetBundlePath?: string;
+  /** "memory" when running on the development in-memory MongoDB. Shown on /health. */
+  database?: "atlas" | "memory";
 }
 
 export interface AppContext {
@@ -112,8 +114,9 @@ export function createApp(deps: AppDeps) {
   const origins = deps.cfg.CORS_ORIGINS.split(",").map((o) => o.trim());
   const dashboardCors = cors({ origin: origins });
 
+  // Safe to expose: says which kind of setup is live, never any values.
   app.get("/health", (_req, res) => {
-    res.json({ ok: true });
+    res.json({ ok: true, database: deps.database ?? "atlas", ai: ctx.aiEnabled, env: deps.cfg.NODE_ENV });
   });
   app.use("/api/public", dashboardCors, publicRoutes(ctx));
   app.use("/api", dashboardCors, dashboardRoutes(ctx));
