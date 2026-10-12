@@ -2,7 +2,14 @@ import { z } from "zod";
 
 const Env = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-  PORT: z.coerce.number().int().default(8787),
+  /**
+   * A TCP port, or a pipe/socket path: LiteSpeed (Hostinger) and Passenger
+   * hand the app a socket path in PORT rather than a number.
+   */
+  PORT: z
+    .string()
+    .default("8787")
+    .transform((p) => (/^\d+$/.test(p) ? Number(p) : p)),
   /** Unset in development means an in-memory MongoDB, seeded on boot. */
   MONGODB_URI: z.string().optional(),
   MONGODB_DB: z.string().default("reviewloop"),

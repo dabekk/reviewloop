@@ -12,3 +12,11 @@ describe("loadConfig", () => {
     expect(() => loadConfig({ NODE_ENV: "production" })).toThrow(/MONGODB_URI/);
   });
 });
+
+describe("PORT", () => {
+  it("accepts a number or the socket path some hosts pass instead", () => {
+    expect(loadConfig({ NODE_ENV: "test", PORT: "3000" }).PORT).toBe(3000);
+    expect(loadConfig({ NODE_ENV: "test", PORT: "/tmp/lsnode.sock" }).PORT).toBe("/tmp/lsnode.sock");
+    expect(loadConfig({ NODE_ENV: "test" }).PORT).toBe(8787);
+  });
+});
